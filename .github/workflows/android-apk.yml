@@ -43,11 +43,22 @@ jobs:
             android/**/*.gradle*
             android/**/gradle-wrapper.properties
 
-      # setup-android passes `packages` verbatim to sdkmanager — must be one space-separated line (not `|` block).
+      # setup-android passes `packages` as one space-separated sdkmanager arg list.
+      # API 37 is published as platforms;android-37.0 (there is no platforms;android-37).
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: "platform-tools platforms;android-37 build-tools;36.0.0"
+          packages: "platform-tools platforms;android-37.0 build-tools;36.0.0"
+
+      # AGP compileSdk = 37 looks up platforms/android-37; sdkmanager installs android-37.0.
+      - name: Alias API 37 platform
+        working-directory: ${{ github.workspace }}
+        run: |
+          platforms="${ANDROID_SDK_ROOT}/platforms"
+          if [ -d "$platforms/android-37.0" ] && [ ! -e "$platforms/android-37" ]; then
+            ln -s android-37.0 "$platforms/android-37"
+          fi
+          ls -l "$platforms"
 
       - name: Write local.properties
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
