@@ -43,14 +43,11 @@ jobs:
             android/**/*.gradle*
             android/**/gradle-wrapper.properties
 
-      # Default `packages: tools platform-tools` fails: package "tools" was removed from the SDK repo.
+      # setup-android passes `packages` verbatim to sdkmanager — must be one space-separated line (not `|` block).
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: |
-            platform-tools
-            platforms;android-37
-            build-tools;36.0.0
+          packages: "platform-tools platforms;android-37 build-tools;36.0.0"
 
       - name: Write local.properties
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
