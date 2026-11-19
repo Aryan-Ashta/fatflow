@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FatFlow</string>
+    <string name="health_permissions_rationale">FatFlow reads weight, body fat, and workouts to set your calorie target, and writes the meals you log.</string>
+    <string name="widget_small_label">FatFlow</string>
+    <string name="widget_wide_label">FatFlow macros</string>
+</resources>
