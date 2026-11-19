@@ -21,6 +21,10 @@ jobs:
     permissions:
       contents: read
 
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
     defaults:
       run:
         working-directory: android
@@ -35,9 +39,21 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: gradle
+          cache-dependency-path: |
+            android/**/*.gradle*
+            android/**/gradle-wrapper.properties
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # setup-android@v3 defaults to sdkmanager package "tools", which no longer exists.
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager --install \
+            "platform-tools" \
+            "platforms;android-37" \
+            "build-tools;36.0.0"
+
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x gradlew
