@@ -19,7 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
 
     env:
       ANDROID_HOME: /usr/local/lib/android/sdk
@@ -79,3 +79,17 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
+
+      - name: Publish GitHub Release
+        if: github.event_name == 'push' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        working-directory: ${{ github.workspace }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          short="${GITHUB_SHA::7}"
+          asset="fatflow-${short}.apk"
+          cp android/app/build/outputs/apk/debug/app-debug.apk "$asset"
+          gh release create "apk-${GITHUB_SHA}" "$asset" \
+            --target "$GITHUB_SHA" \
+            --title "FatFlow debug ${short}" \
+            --notes "Debug APK from \`${GITHUB_SHA}\`."
